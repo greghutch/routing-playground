@@ -28,12 +28,11 @@ import {
   registerHandlers,
 } from "./Map";
 import Select from "react-select";
-import { algoOptions, metroOptions } from "./Data";
+import { algoOptions, metroOptions, getOriginDestinationPairs } from "./Data";
 import { find, debounce, findIndex, filter } from "lodash";
 import { RouteCharts } from "./RouteCharts";
 import Loader from "react-loader-spinner";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
-import { GetRoutes, getCacheKey } from "./Algos";
 import { getQueryStringValue, setQueryStringValue } from "./queryString";
 
 let keyboardListener;
@@ -124,12 +123,18 @@ class App extends React.Component {
     });
 
     this.downloadData = async () => {
-      const metro = this.state.selectedMetroOption.value;
-      const algo = this.state.selectedAlgoOption.value;
-      const algoDefinition = find(algoOptions, { value: algo });
-      const fileName =
-        getCacheKey(metro, algo, algoDefinition.numRoutes) + ".json";
-      const text = JSON.stringify(await GetRoutes({}, metro, algo));
+      console.log("generating route download ...");
+      const routes = metroOptions.map((metro) => {
+        console.log("working on ", metro.label);
+        const metroData = {
+          name: metro.label,
+          pairs: getOriginDestinationPairs(undefined, metro.value, 10000, 0),
+        };
+        return metroData;
+      });
+      console.log("generated", routes);
+      const fileName = "routes.json";
+      const text = JSON.stringify(routes);
       let element = document.createElement("a");
       element.setAttribute(
         "href",
