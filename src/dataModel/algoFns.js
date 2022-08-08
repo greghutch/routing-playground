@@ -18,6 +18,7 @@ const cache = {};
 import { getOriginDestinationPairs } from "./data";
 import { RouteData } from "./routeData";
 import { computeRoutesDirectionsJsSDK } from "../apis/directionsJsSDK";
+import { computeRoutesDirectionsJsSDKOptimizeHack } from "../apis/directionsJsSDKOptimizeHack";
 import { computeRoutesPreferred } from "../apis/routesPreferred";
 
 function getCacheKey(metro, algoDefinition) {
@@ -37,6 +38,13 @@ function getComputeFn(algoDefinition) {
   } else if (algoDefinition.api === "DirectionsJsSDK") {
     computeFn = async (pairs) =>
       computeRoutesDirectionsJsSDK(
+        pairs,
+        algoDefinition.travelMode,
+        algoDefinition.options
+      );
+  } else if (algoDefinition.api === "DirectionsJsSDKOptimizeHack") {
+    computeFn = async (pairs) =>
+      computeRoutesDirectionsJsSDKOptimizeHack(
         pairs,
         algoDefinition.travelMode,
         algoDefinition.options

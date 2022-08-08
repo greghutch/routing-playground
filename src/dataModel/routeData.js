@@ -36,6 +36,27 @@ class RouteData {
       };
     });
   }
+  static createFromHack(routeResults, requestLatency) {
+    let path = [];
+    let waypointMarkers = [];
+    let duration = 0;
+    let distance = 0;
+    routeResults.forEach((routeResult) => {
+      const rd = RouteData.create(routeResult, requestLatency);
+      path = path.concat(rd.polylinePath);
+      waypointMarkers = waypointMarkers.concat(rd.waypointMarkers);
+      distance += rd.distance;
+      duration += rd.duration;
+    });
+
+    return new RouteData(
+      google.maps.geometry.encoding.encodePath(path),
+      distance,
+      duration,
+      requestLatency,
+      waypointMarkers
+    );
+  }
 
   static create(routeResult, requestLatency) {
     // Ideally we'd just save the whole result -- but local storage
